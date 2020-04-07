@@ -1,12 +1,21 @@
-from sqsHandler import SqsHandler
+import boto3
 
 mensagens = []
-for num in range(3000):
+numMsgsToCreate = 3000
+for num in range(numMsgsToCreate):
     mensagens.append({'Id':str(num), 'MessageBody': str(num)})
 
 splitMsg = [mensagens[x:x+10] for x in range(0, len(mensagens), 10)]
-sqs = SqsHandler('<url da sua fila>')
+
+sqs = boto3.client('sqs', region_name ='us-east-1')
+
+queue_url='< URL DA FILA>' 
+
 for lista in splitMsg:    
     print(type(lista))
     print(str(lista))
-    sqs.sendBatch(lista)
+    response = sqs.send_message_batch(
+        QueueUrl=queue_url,
+        Entries=lista
+    )
+    print(response)
